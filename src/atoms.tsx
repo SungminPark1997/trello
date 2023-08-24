@@ -22,5 +22,3 @@ export const toDoState = atom<IToDoState>({
   },
   effects_UNSTABLE: [persistAtom],
 });
-
-// TO_Do[{key:1,text:lksdfleke},{key2,text:ekfjelkfjlekf}]

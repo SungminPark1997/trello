@@ -16,8 +16,23 @@ const Wrapper = styled.div`
   margin: 10px;
   flex-direction: column;
 `;
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
 const Title = styled.div`
   text-align: center;
+  flex-grow: 1; /* 중앙으로 확장 */
+`;
+
+const DeleteBoard = styled.button`
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 `;
 interface IBoardProps {
   toDos: ITodo[];
@@ -67,9 +82,23 @@ function Board({ toDos, boardId }: IBoardProps) {
     });
     setValue("toDo", "");
   };
+
+  const onDelete = () => {
+    setTodo((allTodos) => {
+      const newTodos = { ...allTodos };
+
+      delete newTodos[boardId];
+      return {
+        ...newTodos,
+      };
+    });
+  };
   return (
     <Wrapper>
-      <Title>{boardId}</Title>
+      <TitleWrapper>
+        <Title>{boardId}</Title>
+        <DeleteBoard onClick={onDelete}>X</DeleteBoard>
+      </TitleWrapper>
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}

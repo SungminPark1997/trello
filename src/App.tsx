@@ -1,14 +1,9 @@
 import React from "react";
-import {
-  DragDropContext,
-  Droppable,
-  Draggable,
-  DropResult,
-} from "react-beautiful-dnd";
+import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { styled } from "styled-components";
 import { toDoState } from "./atoms";
-import DragabbleCard from "./Components/DragabbleCard";
 import Board from "./Components/Board";
 const Wrapper = styled.div`
   display: flex;
@@ -19,16 +14,27 @@ const Wrapper = styled.div`
   align-items: center;
   height: 100vh;
 `;
-
-const Boards = styled.div`
+interface Iprop {
+  count: number;
+}
+const Boards = styled.div<Iprop>`
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(${(props) => props.count}, 1fr);
 `;
+const Form = styled.form`
+  width: 10%;
+  input {
+    width: 100%;
+  }
+`;
+interface IForm {
+  board: string;
+}
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
-
+  const { register, setValue, handleSubmit } = useForm<IForm>();
   const onDragEnd = (info: DropResult) => {
     const { source, destination, draggableId } = info;
     if (!destination) return;
@@ -63,11 +69,28 @@ function App() {
       });
     }
   };
-
+  const onCreateBoard = ({ board }: IForm) => {
+    setToDos((allTodos) => {
+      const newBoard = board;
+      return {
+        ...allTodos,
+        [newBoard]: [],
+      };
+    });
+    setValue("board", "");
+  };
+  console.log(Object.keys(toDos).length);
   return (
     <DragDropContext onDragEnd={onDragEnd}>
+      <Form onSubmit={handleSubmit(onCreateBoard)}>
+        <input
+          {...register("board", { required: true })}
+          type="text"
+          placeholder={`Add task on `}
+        />
+      </Form>
       <Wrapper>
-        <Boards>
+        <Boards count={Object.keys(toDos).length}>
           {Object.keys(toDos).map((boardId) => (
             <Board boardId={boardId} key={boardId} toDos={toDos[boardId]} />
           ))}

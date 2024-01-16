@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Droppable } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useSetRecoilState } from "recoil";
@@ -68,6 +69,9 @@ const Area = styled.div<IAreaProps>`
 function Board({ toDos, boardId }: IBoardProps) {
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const setTodo = useSetRecoilState(toDoState);
+
+  const [isClick, setClick] = useState(false);
+
   const onValid = ({ toDo }: IForm) => {
     console.log(toDo);
     const newTodo = {
@@ -99,6 +103,7 @@ function Board({ toDos, boardId }: IBoardProps) {
         <Title>{boardId}</Title>
         <DeleteBoard onClick={onDelete}>X</DeleteBoard>
       </TitleWrapper>
+
       <Form onSubmit={handleSubmit(onValid)}>
         <input
           {...register("toDo", { required: true })}

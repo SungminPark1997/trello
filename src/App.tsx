@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
 import { useForm } from "react-hook-form";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { styled } from "styled-components";
 import { toDoState } from "./atoms";
 import Board from "./Components/Board";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHouse } from "@fortawesome/free-solid-svg-icons";
+interface Iprop {
+  count: number;
+}
+interface IForm {
+  board: string;
+}
 const Wrapper = styled.div`
   display: flex;
   max-width: 1000px;
@@ -14,26 +22,48 @@ const Wrapper = styled.div`
   align-items: center;
   height: 100vh;
 `;
-interface Iprop {
-  count: number;
-}
+
+const CreateBoard = styled.div`
+  color: white;
+  cursor: pointer;
+`;
 const Boards = styled.div<Iprop>`
   display: grid;
   width: 100%;
   grid-template-columns: repeat(${(props) => props.count}, 1fr);
 `;
 const Form = styled.form`
+  display: flex;
+  flex-direction: column;
   width: 10%;
-  input {
-    width: 100%;
+  margin: auto;
+`;
+
+const Input = styled.input`
+  padding: 10px;
+  margin-bottom: 0.2vw;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+`;
+const Button = styled.button`
+  padding: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 0.5em;
+  cursor: pointer;
+  font-size: 1vw;
+
+  &:hover {
+    background-color: #45a049;
   }
 `;
-interface IForm {
-  board: string;
-}
 
 function App() {
   const [toDos, setToDos] = useRecoilState(toDoState);
+  const [isClick, setClick] = useState(false);
   const { register, setValue, handleSubmit } = useForm<IForm>();
   const onDragEnd = (info: DropResult) => {
     const { source, destination, draggableId } = info;
@@ -80,15 +110,29 @@ function App() {
     setValue("board", "");
   };
   console.log(Object.keys(toDos).length);
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Form onSubmit={handleSubmit(onCreateBoard)}>
-        <input
-          {...register("board", { required: true })}
-          type="text"
-          placeholder={`Add task on `}
-        />
-      </Form>
+      <FontAwesomeIcon icon={faHouse} />
+      <CreateBoard
+        onClick={() => {
+          setClick((prev) => !prev);
+        }}
+      >
+        Create Board
+      </CreateBoard>
+
+      {isClick ? (
+        <Form onSubmit={handleSubmit(onCreateBoard)}>
+          <Input
+            {...register("board", { required: true })}
+            type="text"
+            placeholder={`Add task on `}
+          />
+          <Button>add List</Button>
+        </Form>
+      ) : null}
+
       <Wrapper>
         <Boards count={Object.keys(toDos).length}>
           {Object.keys(toDos).map((boardId) => (
